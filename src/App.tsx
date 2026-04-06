@@ -60,30 +60,36 @@ const playSound = (type: 'send' | 'receive' | 'error') => {
 };
 
 // Lidan Video Character
-const LidanCharacter = ({ isReplying }: { isReplying: boolean }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+type CharacterState = 'idle' | 'thinking' | 'speaking';
+
+const LidanCharacter = ({ state }: { state: CharacterState }) => {
+  const speakingRef = useRef<HTMLVideoElement>(null);
+  const thinkingRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (isReplying) {
-      video.play().catch(() => {});
+    const sp = speakingRef.current;
+    const th = thinkingRef.current;
+    if (!sp || !th) return;
+
+    if (state === 'speaking') {
+      sp.play().catch(() => {});
+      th.pause(); th.currentTime = 0;
+    } else if (state === 'thinking') {
+      th.playbackRate = 2.0;
+      th.play().catch(() => {});
+      sp.pause(); sp.currentTime = 0;
     } else {
-      video.pause();
-      video.currentTime = 0;
+      sp.pause(); sp.currentTime = 0;
+      th.pause(); th.currentTime = 0;
     }
-  }, [isReplying]);
+  }, [state]);
 
   return (
-    <div className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center overflow-hidden">
-      <video
-        ref={videoRef}
-        src="/lidan.mp4"
-        loop
-        muted
-        playsInline
-        className="w-full h-full object-cover"
-      />
+    <div className="relative w-48 h-48 md:w-64 md:h-64 overflow-hidden">
+      <video ref={speakingRef} src="/lidan.mp4" loop muted playsInline
+        className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-200 ${state === 'thinking' ? 'opacity-0' : 'opacity-100'}`} />
+      <video ref={thinkingRef} src="/lidan-thinking.mp4" loop muted playsInline
+        className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-200 ${state === 'thinking' ? 'opacity-100' : 'opacity-0'}`} />
     </div>
   );
 };
@@ -182,6 +188,12 @@ export default function App() {
     }
   }, [input, isLoading, messages, isSoundEnabled]);
 
+  const lastMsg = messages[messages.length - 1];
+  const characterState: CharacterState =
+    !isLoading ? 'idle' :
+    lastMsg?.role === 'assistant' && lastMsg.content === '' ? 'thinking' :
+    'speaking';
+
   return (
     <div className="min-h-screen bg-[#2d1b4e] flex flex-col items-center p-4 md:p-8 font-dotgothic text-[#e0def4] relative overflow-hidden">
       {/* Background */}
@@ -217,10 +229,10 @@ export default function App() {
         {/* Character */}
         <div className="sticky top-8 flex flex-col items-center">
           <div className="p-4 bg-[#1f1d2e] border-4 border-[#191724] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]">
-            <LidanCharacter isReplying={isLoading} />
+            <LidanCharacter state={characterState} />
           </div>
           <div className="mt-6 px-6 py-2 bg-[#31748f] text-white border-4 border-[#191724] text-sm font-pixel uppercase tracking-widest">
-            {isLoading ? 'Speaking' : 'Idle'}
+            {characterState === 'thinking' ? 'Thinking' : characterState === 'speaking' ? 'Speaking' : 'Idle'}
           </div>
         </div>
 
