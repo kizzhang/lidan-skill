@@ -1,0 +1,5 @@
+{
+  "name": "Pixel Chatbot",
+  "description": "A simple chatbot with a pixel art character that animates while speaking.",
+  "requestFramePermissions": []
+}

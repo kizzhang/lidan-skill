@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=DotGothic16&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-pixel: "Press Start 2P", system-ui, sans-serif;
+  --font-silkscreen: "Silkscreen", system-ui, sans-serif;
+  --font-dotgothic: "DotGothic16", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply font-dotgothic bg-[#2d1b4e] text-[#e0def4];
+    image-rendering: pixelated;
+  }
+}
+
+@layer components {
+  .pixel-border {
+    position: relative;
+    border: 4px solid #191724;
+    box-shadow: 
+      inset -4px -4px 0px 0px rgba(0,0,0,0.1),
+      4px 4px 0px 0px rgba(0,0,0,0.2);
+  }
+
+  .pixel-button {
+    @apply relative px-4 py-2 transition-all active:translate-y-1 active:shadow-none;
+    border: 4px solid #191724;
+    box-shadow: 0 4px 0 #191724;
+  }
+
+  .pixel-input {
+    @apply bg-[#1f1d2e] border-4 border-[#191724] px-4 py-2 outline-none focus:border-[#908caa] transition-colors;
+  }
+
+  .pixel-card {
+    @apply bg-[#1f1d2e] border-4 border-[#191724] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)];
+  }
+}
