@@ -63,6 +63,7 @@ npm run dev
 ### 功能
 
 - **流式输出**：回复实时逐字出现，角色动画同步播放
+- **三态角色动画**：思考中（2× 快放）→ 说话中（正常播放）→ 待机（静止）
 - **李诞 Persona**：不说教、不端着、不虚无。道理裹在段子里
 - **自媒体创作**：直接让他帮你写稿，或者把稿子发给他让他给建议
 - **读稿会模式**：发文章过去，他会像在读稿会上一样给修改意见
@@ -70,8 +71,9 @@ npm run dev
 ### 项目结构
 
 ```
-├── src/App.tsx       # 前端主组件（聊天界面 + 视频角色）
-├── server.ts         # Express 后端（DeepSeek streaming）
-├── public/lidan.mp4  # 李诞角色动画
-└── lidan.skill       # Claude Code Skill 文件
+├── src/App.tsx              # 前端主组件（聊天界面 + 视频角色）
+├── server.ts                # Express 后端（DeepSeek streaming）
+├── public/lidan.mp4         # 说话动画
+├── public/lidan-thinking.mp4 # 思考动画（2× 快放）
+└── lidan.skill              # Claude Code Skill 文件
 ```
