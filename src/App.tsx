@@ -23,29 +23,13 @@ const INITIAL_MESSAGES: Message[] = [
 ];
 
 
-const playSound = (type: 'send' | 'error') => {
-  const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-  if (!AudioContextClass) return;
-  const ctx = new AudioContextClass();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  const now = ctx.currentTime;
-  if (type === 'send') {
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, now);
-    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
-    gain.gain.setValueAtTime(0.1, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-    osc.start(now); osc.stop(now + 0.1);
-  } else {
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(150, now);
-    gain.gain.setValueAtTime(0.05, now);
-    gain.gain.linearRampToValueAtTime(0, now + 0.3);
-    osc.start(now); osc.stop(now + 0.3);
-  }
+// Li Dan voice sound effects (pre-generated via Fish Audio)
+type SoundType = 'send' | 'thinking' | 'receive' | 'error' | 'welcome' | 'reset';
+
+const playSound = (type: SoundType, enabled = true) => {
+  if (!enabled) return;
+  const audio = new Audio(`/sounds/${type}.mp3`);
+  audio.play().catch(() => {});
 };
 
 // Lidan Video Character
@@ -150,6 +134,13 @@ export default function App() {
   };
 
   useEffect(() => {
+    // Welcome sound on first load (after a short delay so audio context can initialize)
+    const t = setTimeout(() => playSound('welcome', isSoundEnabled), 800);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
@@ -163,7 +154,7 @@ export default function App() {
     setMessages(prev => [...prev, userMsg, botMsg]);
     setInput('');
     setIsLoading(true);
-    if (isSoundEnabled) playSound('send');
+    playSound('send', isSoundEnabled);
 
     try {
       const history = [...messages, userMsg].map(m => ({ role: m.role, content: m.content }));
@@ -178,21 +169,27 @@ export default function App() {
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
+      let firstChunk = true;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
+        if (firstChunk) {
+          firstChunk = false;
+          playSound('thinking', isSoundEnabled);
+        }
         setMessages(prev =>
           prev.map(m => m.id === botId ? { ...m, content: m.content + chunk } : m)
         );
       }
 
+      playSound('receive', isSoundEnabled);
     } catch {
       setMessages(prev =>
         prev.map(m => m.id === botId ? { ...m, content: '哎呀出错了，稍后再试试。' } : m)
       );
-      if (isSoundEnabled) playSound('error');
+      playSound('error', isSoundEnabled);
     } finally {
       setIsLoading(false);
     }
@@ -228,7 +225,7 @@ export default function App() {
           <button onClick={() => setIsSoundEnabled(s => !s)} className="p-2 bg-[#1f1d2e] border-4 border-[#191724] hover:bg-[#26233a] transition-colors text-[#908caa]">
             {isSoundEnabled ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
           </button>
-          <button onClick={() => { setMessages(INITIAL_MESSAGES); setInput(''); }} className="p-2 bg-[#1f1d2e] border-4 border-[#191724] hover:bg-[#26233a] transition-colors text-[#908caa]">
+          <button onClick={() => { setMessages(INITIAL_MESSAGES); setInput(''); playSound('reset', isSoundEnabled); }} className="p-2 bg-[#1f1d2e] border-4 border-[#191724] hover:bg-[#26233a] transition-colors text-[#908caa]">
             <RefreshCw className="w-6 h-6" />
           </button>
         </div>
