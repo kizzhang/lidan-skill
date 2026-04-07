@@ -22,8 +22,28 @@ const INITIAL_MESSAGES: Message[] = [
   },
 ];
 
-// Sound Synthesis
-const playSound = (type: 'send' | 'receive' | 'error') => {
+// Sound — Li Dan TTS phrases via Fish Audio
+const LIDAN_PHRASES = ['人间不值得', '开心点', '嗯', '说吧', '话说回来', '好嘞'];
+
+const playLidanSound = async (soundEnabled: boolean) => {
+  if (!soundEnabled) return;
+  const text = LIDAN_PHRASES[Math.floor(Math.random() * LIDAN_PHRASES.length)];
+  try {
+    const res = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok || !res.body) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.onended = () => URL.revokeObjectURL(url);
+    audio.play().catch(() => {});
+  } catch {}
+};
+
+const playSound = (type: 'send' | 'error') => {
   const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
   if (!AudioContextClass) return;
   const ctx = new AudioContextClass();
@@ -32,30 +52,19 @@ const playSound = (type: 'send' | 'receive' | 'error') => {
   osc.connect(gain);
   gain.connect(ctx.destination);
   const now = ctx.currentTime;
-  switch (type) {
-    case 'send':
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, now);
-      osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-      osc.start(now); osc.stop(now + 0.1);
-      break;
-    case 'receive':
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(660, now);
-      osc.frequency.exponentialRampToValueAtTime(440, now + 0.2);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-      osc.start(now); osc.stop(now + 0.2);
-      break;
-    case 'error':
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(150, now);
-      gain.gain.setValueAtTime(0.05, now);
-      gain.gain.linearRampToValueAtTime(0, now + 0.3);
-      osc.start(now); osc.stop(now + 0.3);
-      break;
+  if (type === 'send') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, now);
+    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+    osc.start(now); osc.stop(now + 0.1);
+  } else {
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(150, now);
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+    osc.start(now); osc.stop(now + 0.3);
   }
 };
 
@@ -177,7 +186,7 @@ export default function App() {
         );
       }
 
-      if (isSoundEnabled) playSound('receive');
+      playLidanSound(isSoundEnabled);
     } catch {
       setMessages(prev =>
         prev.map(m => m.id === botId ? { ...m, content: '哎呀出错了，稍后再试试。' } : m)

@@ -63,6 +63,41 @@ const LIDAN_SYSTEM_PROMPT = `你是李诞——脱口秀演员、编剧、自媒
 
 平视。不是老师不是导师。是坐在你对面喝酒的朋友，比你多喝了两杯所以话多了点。安慰人不灌鸡汤："这事确实糟心，但想想，过一阵你就忘了——不是因为你释怀了，是因为会有新的糟心事。"`;
 
+app.post('/api/tts', async (req, res) => {
+  const { text } = req.body;
+  if (!text) { res.status(400).json({ error: 'missing text' }); return; }
+
+  const fishRes = await fetch('https://api.fish.audio/v1/tts', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.FISH_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      text,
+      reference_id: process.env.FISH_VOICE_ID,
+      format: 'mp3',
+      streaming: true,
+    }),
+  });
+
+  if (!fishRes.ok || !fishRes.body) {
+    res.status(502).json({ error: `Fish Audio error ${fishRes.status}` });
+    return;
+  }
+
+  res.setHeader('Content-Type', 'audio/mpeg');
+  const reader = (fishRes.body as any).getReader();
+  const write = async () => {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) { res.end(); break; }
+      res.write(Buffer.from(value));
+    }
+  };
+  write().catch(() => res.end());
+});
+
 app.post('/api/chat', async (req, res) => {
   const { messages } = req.body;
 
