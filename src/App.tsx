@@ -227,18 +227,24 @@ export default function App() {
 
       {/* Header */}
       <header className="w-full max-w-4xl flex justify-between items-center mb-12 relative z-10">
-        <div className="flex items-center gap-4">
-          <div className="p-2 bg-[#1f1d2e] border-4 border-[#191724] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]">
-            <Bot className="w-8 h-8 text-[#ebbcba]" />
+        {/* Title nameplate */}
+        <div className="flex items-center gap-0">
+          <div className="px-3 py-2 bg-[#ebbcba] border-4 border-[#191724] shadow-[4px_4px_0px_0px_#191724] flex items-center">
+            <Bot className="w-6 h-6 text-[#191724]" />
           </div>
-          <h1 className="text-2xl font-pixel tracking-tighter text-[#ebbcba] uppercase">蛋总在线</h1>
+          <div className="px-4 py-2 bg-[#191724] border-4 border-l-0 border-[#191724] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.4)]">
+            <h1 className="text-xl font-dotgothic tracking-[0.15em] text-[#ebbcba] leading-none" style={{ textShadow: '2px 2px 0 #000, -1px -1px 0 #000' }}>
+              蛋总在线
+            </h1>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <button onClick={() => setIsSoundEnabled(s => !s)} className="p-2 bg-[#1f1d2e] border-4 border-[#191724] hover:bg-[#26233a] transition-colors text-[#908caa]">
-            {isSoundEnabled ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
+        {/* Controls */}
+        <div className="flex items-center gap-2">
+          <button onClick={() => setIsSoundEnabled(s => !s)} className="px-3 py-2 bg-[#191724] border-4 border-[#191724] hover:bg-[#26233a] transition-colors text-[#908caa] shadow-[2px_2px_0px_0px_rgba(0,0,0,0.4)] active:translate-y-px">
+            {isSoundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
           </button>
-          <button onClick={() => { setMessages(INITIAL_MESSAGES); setInput(''); playSound('reset', isSoundEnabled); }} className="p-2 bg-[#1f1d2e] border-4 border-[#191724] hover:bg-[#26233a] transition-colors text-[#908caa]">
-            <RefreshCw className="w-6 h-6" />
+          <button onClick={() => { setMessages(INITIAL_MESSAGES); setInput(''); playSound('reset', isSoundEnabled); }} className="px-3 py-2 bg-[#191724] border-4 border-[#191724] hover:bg-[#26233a] transition-colors text-[#908caa] shadow-[2px_2px_0px_0px_rgba(0,0,0,0.4)] active:translate-y-px">
+            <RefreshCw className="w-5 h-5" />
           </button>
         </div>
       </header>

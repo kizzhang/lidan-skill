@@ -11,6 +11,8 @@
   body {
     @apply font-dotgothic bg-[#2d1b4e] text-[#e0def4];
     image-rendering: pixelated;
+    -webkit-font-smoothing: none;
+    font-smooth: never;
   }
 }
 
