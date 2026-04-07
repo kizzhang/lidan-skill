@@ -244,7 +244,7 @@ export default function App() {
       </header>
 
       {/* Main */}
-      <main className="w-full max-w-4xl flex-1 flex flex-col md:flex-row gap-12 items-center md:items-start">
+      <main className="w-full max-w-4xl flex-1 flex flex-col md:flex-row gap-12 items-center md:items-start relative z-10">
         {/* Character */}
         <div className="sticky top-8 flex flex-col items-center">
           <div className="p-4 bg-[#1f1d2e] border-4 border-[#191724] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]">
@@ -328,7 +328,7 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="mt-12 text-[#6e6a86] text-[10px] font-pixel uppercase tracking-widest text-center">
+      <footer className="mt-12 text-[#6e6a86] text-[10px] font-pixel uppercase tracking-widest text-center relative z-10">
         &copy; 2026 蛋总在线 // 人间不值得，但这里还行
       </footer>
 
