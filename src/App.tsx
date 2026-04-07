@@ -229,29 +229,8 @@ export default function App() {
       <header className="w-full max-w-4xl flex justify-between items-center mb-12 relative z-10">
         {/* Title nameplate */}
         <div className="flex items-center gap-0">
-          <div className="px-3 py-2 bg-[#ebbcba] border-4 border-[#191724] shadow-[4px_4px_0px_0px_#191724] flex items-center">
-            {/* Pixel egg icon */}
-            <svg viewBox="0 0 16 20" className="w-6 h-6" style={{ imageRendering: 'pixelated' }}>
-              <rect x="4" y="0" width="8" height="2" fill="#191724"/>
-              <rect x="2" y="2" width="12" height="2" fill="#191724"/>
-              <rect x="1" y="4" width="14" height="12" fill="#191724"/>
-              <rect x="2" y="16" width="12" height="2" fill="#191724"/>
-              <rect x="4" y="18" width="8" height="2" fill="#191724"/>
-              {/* fill */}
-              <rect x="5" y="1" width="6" height="1" fill="#ebbcba"/>
-              <rect x="3" y="3" width="10" height="1" fill="#ebbcba"/>
-              <rect x="2" y="5" width="12" height="10" fill="#ebbcba"/>
-              <rect x="3" y="15" width="10" height="1" fill="#ebbcba"/>
-              <rect x="5" y="17" width="6" height="1" fill="#ebbcba"/>
-              {/* shine */}
-              <rect x="3" y="4" width="3" height="5" fill="#fff5f0" opacity="0.6"/>
-              {/* shadow */}
-              <rect x="10" y="8" width="3" height="6" fill="#c4a7e7" opacity="0.5"/>
-              {/* glasses */}
-              <rect x="3" y="9" width="4" height="3" fill="none" stroke="#191724" strokeWidth="1"/>
-              <rect x="9" y="9" width="4" height="3" fill="none" stroke="#191724" strokeWidth="1"/>
-              <rect x="7" y="10" width="2" height="1" fill="#191724"/>
-            </svg>
+          <div className="px-2 py-1 bg-[#191724] border-4 border-[#191724] shadow-[4px_4px_0px_0px_#191724] flex items-center">
+            <img src="/egg-icon.png" alt="蛋" className="w-8 h-8" style={{ imageRendering: 'pixelated' }} />
           </div>
           <div className="px-4 py-2 bg-[#191724] border-4 border-l-0 border-[#191724] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.4)]">
             <h1 className="text-xl font-dotgothic tracking-[0.15em] text-[#ebbcba] leading-none" style={{ textShadow: '2px 2px 0 #000, -1px -1px 0 #000' }}>
