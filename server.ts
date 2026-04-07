@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import { Readable } from 'stream';
 import { createDeepSeek } from '@ai-sdk/deepseek';
 import { streamText, pipeTextStreamToResponse } from 'ai';
 
@@ -77,25 +78,18 @@ app.post('/api/tts', async (req, res) => {
       text,
       reference_id: process.env.FISH_VOICE_ID,
       format: 'mp3',
-      streaming: true,
     }),
   });
 
   if (!fishRes.ok || !fishRes.body) {
-    res.status(502).json({ error: `Fish Audio error ${fishRes.status}` });
+    const detail = await fishRes.text().catch(() => '');
+    console.error('Fish Audio error:', fishRes.status, detail);
+    res.status(502).json({ error: `Fish Audio ${fishRes.status}`, detail });
     return;
   }
 
   res.setHeader('Content-Type', 'audio/mpeg');
-  const reader = (fishRes.body as any).getReader();
-  const write = async () => {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) { res.end(); break; }
-      res.write(Buffer.from(value));
-    }
-  };
-  write().catch(() => res.end());
+  Readable.fromWeb(fishRes.body as any).pipe(res);
 });
 
 app.post('/api/chat', async (req, res) => {

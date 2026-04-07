@@ -22,26 +22,6 @@ const INITIAL_MESSAGES: Message[] = [
   },
 ];
 
-// Sound — Li Dan TTS phrases via Fish Audio
-const LIDAN_PHRASES = ['人间不值得', '开心点', '嗯', '说吧', '话说回来', '好嘞'];
-
-const playLidanSound = async (soundEnabled: boolean) => {
-  if (!soundEnabled) return;
-  const text = LIDAN_PHRASES[Math.floor(Math.random() * LIDAN_PHRASES.length)];
-  try {
-    const res = await fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
-    });
-    if (!res.ok || !res.body) return;
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.onended = () => URL.revokeObjectURL(url);
-    audio.play().catch(() => {});
-  } catch {}
-};
 
 const playSound = (type: 'send' | 'error') => {
   const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
@@ -145,7 +125,29 @@ export default function App() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const speakMessage = async (msgId: string, text: string) => {
+    if (!isSoundEnabled || speakingMsgId === msgId) return;
+    setSpeakingMsgId(msgId);
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) { setSpeakingMsgId(null); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); setSpeakingMsgId(null); };
+      audio.onerror = () => { URL.revokeObjectURL(url); setSpeakingMsgId(null); };
+      audio.play().catch(() => setSpeakingMsgId(null));
+    } catch {
+      setSpeakingMsgId(null);
+    }
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -186,7 +188,6 @@ export default function App() {
         );
       }
 
-      playLidanSound(isSoundEnabled);
     } catch {
       setMessages(prev =>
         prev.map(m => m.id === botId ? { ...m, content: '哎呀出错了，稍后再试试。' } : m)
@@ -267,6 +268,16 @@ export default function App() {
                       <div className="prose prose-invert prose-sm max-w-none font-dotgothic leading-relaxed">
                         <ReactMarkdown>{msg.content}</ReactMarkdown>
                       </div>
+                      {msg.role === 'assistant' && (
+                        <button
+                          onClick={() => speakMessage(msg.id, msg.content)}
+                          disabled={speakingMsgId === msg.id}
+                          className="mt-3 flex items-center gap-1 text-[#908caa] hover:text-[#ebbcba] text-xs font-pixel uppercase tracking-tighter transition-colors disabled:opacity-40"
+                        >
+                          <Volume2 className="w-3 h-3" />
+                          {speakingMsgId === msg.id ? '播放中...' : '读出来'}
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 );
