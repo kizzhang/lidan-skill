@@ -202,9 +202,21 @@ export default function App() {
     'speaking';
 
   return (
-    <div className="min-h-screen bg-[#2d1b4e] flex flex-col items-center p-4 md:p-8 font-dotgothic text-[#e0def4] relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center p-4 md:p-8 font-dotgothic text-[#e0def4] relative overflow-hidden">
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        style={{ zIndex: 0 }}
+        src="/bg.mp4"
+      />
+      {/* Dark overlay to keep text readable */}
+      <div className="absolute inset-0 bg-[#2d1b4e]/70 pointer-events-none" style={{ zIndex: 1 }} />
+      {/* Background decorations */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 2 }}>
         <PixelCloud className="absolute top-10 left-[5%] opacity-20" />
         <PixelCloud className="absolute top-40 right-[10%] opacity-10" />
         <PixelStar className="absolute top-20 left-[20%]" delay={0.5} />
