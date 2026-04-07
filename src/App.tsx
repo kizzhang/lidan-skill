@@ -229,9 +229,7 @@ export default function App() {
       <header className="w-full max-w-4xl flex justify-between items-center mb-12 relative z-10">
         {/* Title nameplate */}
         <div className="flex items-center gap-0">
-          <div className="px-2 py-1 bg-[#191724] border-4 border-[#191724] shadow-[4px_4px_0px_0px_#191724] flex items-center">
-            <img src="/egg-icon.png" alt="蛋" className="w-8 h-8" style={{ imageRendering: 'pixelated' }} />
-          </div>
+          <img src="/egg-icon.png" alt="蛋" className="w-12 h-12" style={{ imageRendering: 'pixelated' }} />
           <div className="px-4 py-2 bg-[#191724] border-4 border-l-0 border-[#191724] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.4)]">
             <h1 className="text-xl font-dotgothic tracking-[0.15em] text-[#ebbcba] leading-none" style={{ textShadow: '2px 2px 0 #000, -1px -1px 0 #000' }}>
               蛋总在线
